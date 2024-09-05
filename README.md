@@ -19,10 +19,9 @@ No se cambia ninungo entonces vuelvo a hacer click en **Next**:
 5.No se cambia el lugar donde esta la carpeta  
 ![](https://github.com/carandprz/Include/blob/main/captura_readme/Captura5.PNG)
 
-6. Hace click en **Next**
+6. Hace click en **Next**.
+   
 ![](https://github.com/carandprz/Include/blob/main/captura_readme/Captura6.PNG)
-
-
 Aparece el lenguaje para elegir solo hay en version ingles y aleman , se deja en ingles.
 
 8. Vuelvo a dar click en **Next** y aparece el titulo **Ready to install**
