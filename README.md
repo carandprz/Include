@@ -11,8 +11,9 @@
 3. Ejecuto el archivo descargargo de xampp.exe y deberia aparecer asi :
 ![](https://github.com/carandprz/Include/blob/main/captura_readme/captura3.PNG)
 
-4. Hago en click en  **Next** y aparece los componentes de XAMPP.No se cambia ninungo entonces vuelvo a hacer click en **Next**:
-   
+4. Hago en click en  **Next** y aparece los componentes de XAMPP.
+No se cambia ninungo entonces vuelvo a hacer click en **Next**:
+
 ![](https://github.com/carandprz/Include/blob/main/captura_readme/captura4.PNG)
 
 5.No se cambia el lugar donde esta la carpeta  
