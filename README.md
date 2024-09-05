@@ -32,9 +32,15 @@ Aparece el lenguaje para elegir solo hay en version ingles y aleman , se deja en
 
 ![](https://github.com/carandprz/Include/blob/main/captura_readme/Captura8.PNG)
 
-9. Una vez installado el xampp. Ejecuto el programa y doy click en STAR EN
+![](https://github.com/carandprz/Include/blob/main/captura_readme/Captura9.PNG)
+
+9. Una vez installado el xampp. Ejecuto el programa y doy click en STAR 
      * Apache
-     * 
+     * MySQL
+       
+![](https://github.com/carandprz/Include/blob/main/captura_readme/Captura10.PNG)
+
+Listo 
 
 ## Instalar pip 
 
