@@ -20,15 +20,17 @@
 
 6. Hace click en **Next**
 ![](https://github.com/carandprz/Include/blob/main/captura_readme/Captura6.PNG)
+
+
 Aparece el lenguaje para elegir solo hay en version ingles y aleman , se deja en ingles.
 
-7. Vuelvo a dar click en **Next** y aparece el titulo **Ready to install**
+8. Vuelvo a dar click en **Next** y aparece el titulo **Ready to install**
 ![](https://github.com/carandprz/Include/blob/main/captura_readme/Captura7.PNG)
 
-8. Dar click en **Next** y el se empieza a instalar el programa
+9. Dar click en **Next** y el se empieza a instalar el programa
 ![](https://github.com/carandprz/Include/blob/main/captura_readme/Captura8.PNG)
 
-9. Una vez installado el xampp. Ejecuto el programa y doy click en STAR EN
+10. Una vez installado el xampp. Ejecuto el programa y doy click en STAR EN
      * Apache
      * 
 
