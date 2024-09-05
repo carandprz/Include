@@ -40,7 +40,7 @@ Aparece el lenguaje para elegir solo hay en version ingles y aleman , se deja en
        
 ![](https://github.com/carandprz/Include/blob/main/captura_readme/Captura10.PNG)
 
-Listo 
+Con el xampp asi , ya se puede ejecutar el app.py
 
 ## Instalar pip 
 
