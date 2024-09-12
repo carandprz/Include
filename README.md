@@ -60,7 +60,7 @@ Con el xampp asi , ya se puede ejecutar el app.py
      
 6. El *tercer* comando a installar es para que funcione Mysql con python-Flask
       **pip install mysql-connector-python**
-![](https://github.com/carandprz/Include/blob/main/captura_readme/flask4.PNG)
+![](https://github.com/carandprz/Include/blob/main/captura_readme/flask4.png)
 
    
    
