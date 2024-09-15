@@ -25,23 +25,27 @@ def index():
 
 # Indice 
 
-@app.route('/servicios')
+@app.route('/servicios') # esto va para el htlm
 def pag_servicio():
-    return render_template('servicios.html')
+    return render_template('servicios.html') # ruta del archivo para q lo distinga python 
 
-@app.route('/audiolibros')
+@app.route('/lector')
+def pag_lector():
+    return render_template('servicios/lector.html')
+
+@app.route('/audioLibro')
 def pag_audiolibros():
-    return render_template('audiolibros.html')
+    return render_template('servicios/audioLibro.html')
 
 @app.route('/podcast')
 def pag_podcast():
-    return render_template('podcast.html')
+    return render_template('servicios/podcast.html')
 
 @app.route('/cursos')
 def pag_cursos():
-    return render_template('cursos.html')
+    return render_template('servicios/cursos.html')
 
-#Usuario
+#REGISTRO Y LOGIN -------------------------
 @app.route('/registro')
 def pag_registrar():
     return render_template('auth/registro_usuarios.html')
@@ -49,10 +53,6 @@ def pag_registrar():
 @app.route('/login')
 def pag_login():
     return render_template('auth/login.html')
-
-@app.route('/ingreso_user')
-def pag_ingreso():
-    return render_template('ingreso.html')
 
 #rutas pie de paginas
 @app.route('/normas')
@@ -68,6 +68,10 @@ def pag_nosotros():
     return render_template('sobre-include.html')
 
 #administrador
+@app.route('/admi')
+def pag_admin():
+    return render_template('admi.html')
+
 @app.route('/admin-home')
 def pag_admin_home():
     return render_template('admin-home.html')
@@ -75,6 +79,15 @@ def pag_admin_home():
 @app.route('/admin-login')
 def pag_admin_login():
     return render_template('auth/admin-login.html')
+
+#pagina de registro exitoso y usuario logeado
+@app.route('/ingreso')
+def pag_bienvenido():
+    return render_template('auth/ingreso.html')
+
+@app.route('/reg_exitoso')
+def pag_reg_exitoso():
+    return render_template('aut/reg_exitoso.html')
 
 
 #funciones 
@@ -103,40 +116,55 @@ def agregar_usuario():
             data = (id_usuario, nombre, apellido, correo_electronico, contrasena, fecha_nacimiento, telefono, pais)
             cursor.execute(sql, data )
             db.database.commit()
-            #flash('Usuario agregado exitosamente')
+            flash('Usuario agregado exitosamente')
+            return render_template('auth/reg_exitoso.html') # Redirige a página de éxito
         except MySQLdb.Error as e:
             flash(f'Error al agregar el usuario: {e}')
             return redirect(url_for('pag_registrar'))
         
-        return redirect(url_for('pag_registrar'))
+    return redirect(url_for('pag_registrar'))
 
 #para login 
 @app.route('/ingresar_usuario', methods=['GET','POST'])
 def ingresar_usuario():
     if request.method == 'POST':
-        user = User(request.form['username'],request.form['password'])
-        logger_user = ModelUser.login(db,user)
-        # Verifca usuario y contraseña 
-        if logger_user is not None :
-            if logger_user.password == user.password:
-                return redirect(url_for('pag_ingreso'))
+        # Capturar los datos del formulario
+        username = request.form['username']
+        password = request.form['password']
+
+        # Crear un objeto Usuario
+        user = User(username, password)
+
+        # Intentar hacer login
+        try:
+            logger_user = ModelUser.login(db, user)
+            # Verifica si el usuario existe
+            if logger_user is not None:
+                # Comparar las contraseñas (texto plano)
+                if logger_user.password == user.password:
+                    return render_template('auth/ingreso.html')  # Redirige al éxito
+                else:
+                    flash("Usuario o contraseña incorrectos")
+                    return render_template('auth/login.html')
             else:
-                flash("Usuario/ contraseña incorrecto")
+                flash("Usuario o contraseña incorrectos")
                 return render_template('auth/login.html')
-        else: #no existe usuario
-            flash("Usuario/ contraseña incorrecto..")
+
+        except Exception as e:
+            flash(f'Error durante el inicio de sesión: {str(e)}')  # Captura el error
             return render_template('auth/login.html')
-    else:
-        return render_template('auth/login.html')
+
+    # Si es un método GET, simplemente renderiza la página de login
+    return render_template('auth/login.html')
     
-@app.route('/escuhar_mp3')
-def podcast():
-    with connection.cursor() as cursor:
-        # Consulta para obtener las rutas de los audios
-        sql = "SELECT nombre, ruta FROM archivos"
-        cursor.execute(sql)
-        audios = cursor.fetchall()
-    return render_template('podcast.html', audios=audios)
+#@app.route('/escuhar_mp3')
+#def podcast():
+#    with connection.cursor() as cursor:
+#        # Consulta para obtener las rutas de los audios
+#        sql = "SELECT nombre, ruta FROM archivos"
+#        cursor.execute(sql)
+#        audios = cursor.fetchall()
+#    return render_template('podcast.html', audios=audios)
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
