@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LECTOR USUARIO </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v2.1.5/dist/tesseract.min.js"></script>
+    <link rel="stylesheet" href="../static/styles.css">
+    <!--favicon-->
+    <link rel="icon" href="../static/imagenes/Imageninclude.png" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">INCLUDE</a>
+                <!-- Otros enlaces de navegación -->
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1 class="text-center my-5">Reconocimiento de Texto desde Cámara</h1>
+
+        <!-- Video en vivo de la cámara -->
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <video id="video" width="80%" autoplay></video>
+                <button id="capture-button" class="btn btn-primary my-3">Capturar y Leer Texto</button>
+                <canvas id="canvas" style="display:none;"></canvas>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h4 class="text-center">Texto Detectado:</h4>
+                <p id="detected-text" class="text-center"></p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center mt-5">
+        <p>INCLUDE - 2024. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const detectedText = document.getElementById('detected-text');
+
+        // Acceder a la cámara del usuario
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error('Error al acceder a la cámara:', err);
+            });
+
+        document.getElementById('capture-button').addEventListener('click', () => {
+            // Capturar el frame del video
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convertir la imagen capturada en texto usando Tesseract.js
+            Tesseract.recognize(canvas, 'eng', { logger: m => console.log(m) })
+                .then(({ data: { text } }) => {
+                    detectedText.textContent = text;
+                    speakText(text);
+                });
+        });
+
+        // Función para leer el texto en voz alta
+        function speakText(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'es-ES';  // Puedes ajustar el idioma
+            window.speechSynthesis.speak(speech);
+        }
+    </script>
+</body>
+</html>
