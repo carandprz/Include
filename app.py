@@ -1,11 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for,flash
 from flask_mysqldb import MySQL
-import voz 
 import database as db
 
+from flask_login import LoginManager, login_user,logout_user,login_required
+#from flask_wtf.csrf import CSRFProtect
 #modelos para login 
 from models.ModelUser import ModelUser
 from models.entities.User import User
+from models.ModelAdmi import ModelAdmi
+from models.entities.Admi import Admi
 
 app = Flask(__name__)
 
