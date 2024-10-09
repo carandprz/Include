@@ -11,6 +11,24 @@ app = Flask(__name__)
 
 mysql = MySQL(app)
 
+login_manager_app= LoginManager(app) 
+
+#---------- LOGEAR NOMBRE EN BIENVENIDOS 
+
+@login_manager_app.user_loader
+def load_user(user_id):
+    # Intenta cargar como usuario regular
+    user = ModelUser.get_by_id(db, user_id)
+    if user is not None:
+        return user
+    
+    # Si no existe como usuario regular, intenta cargar como administrador
+    admin = ModelAdmi.get_by_id(db, user_id)
+    if admin is not None:
+        return admin
+    
+    return None  # Si no se encontró ningún usuario
+
 # settings
 app.secret_key = 'mysecretkey'
 
@@ -152,7 +170,33 @@ def ingresar_usuario():
 
     # Si es un método GET, simplemente renderiza la página de login
     return render_template('auth/login.html')
-    
+
+# INGRESAR ADMINISTRADOR 
+@app.route('/admin_login', methods=['GET', 'POST'])
+def admin_login(): 
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        admi = Admi(username, password)
+        try:
+            logged_admi = ModelAdmi.login(db.database, admi)
+            if logged_admi is not None:
+                if logged_admi.password == admi.password:
+                    login_user(logged_admi)
+                    # Pasar nombre y apellido al template
+                    try:
+                        return render_template('auth/pag_admi/ingreso_admi.html', nombre=logged_admi.name)
+                    except Exception as e:
+                        flash(f'Error al renderizar la plantilla: {str(e)}')
+                        return redirect(url_for('admin_login'))  # O cualquier otra ruta que quieras
+                    #return render_template('auth/pag_admi/ingreso_admi.html', nombre=logged_admi.name)
+                else:
+                    flash("contraseña incorrectos")
+            else:
+                flash("Usuario incorrectos")
+        except Exception as e:
+            flash(f'Error durante el inicio de sesión: {str(e)}')
+    return render_template('auth/login_admi.html')
 #@app.route('/escuhar_mp3')
 #def podcast():
 #    with connection.cursor() as cursor:
