@@ -67,11 +67,19 @@ CREATE TABLE IF NOT EXISTS lista_canciones (
 #-------------------------------- ADMINISTRADORES ------------------------------------
 -- Tabla para almacenar información de los administradores
 CREATE TABLE IF NOT EXISTS administradores (
-    id_admi INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_usuario VARCHAR(50) NOT NULL,
+    usuario varchar(10) primary key,
+    nombre_completo VARCHAR(50) NOT NULL,
     correo_electronico VARCHAR(100) NOT NULL,
     contrasena VARCHAR(255) NOT NULL, -- Se recomienda usar un hash en lugar de almacenar la contraseña directamente
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+#tabla que habla sobre el archivo 
+CREATE TABLE audios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL
 );
 
 -- Tabla para almacenar el contenido subido por los administradores
