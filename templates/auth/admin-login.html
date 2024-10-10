@@ -75,8 +75,19 @@
                 <div class="col-4 pt-5"> 
                     <div class="ingreso-container">
                         <h2 id="user-login" title="Ingreso de Usuarios" class="mb-3 text-center atkinson-hyperlegible-bold">Ingreso de Administrador</h2>
-                        <form>
-                            <div class="form-group pb-2">        
+                        <!-- mensaje para error de usuario -->
+                        {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class= "alert alert-primary alert-dismissible" role="alert">
+                            <strong> {{ message }} </strong>
+                            <button type= "button" class="btn-close" data-bs-dismissible="alert" aria-label="Close"></button> 
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                        <form id="login-form" action="/admi_login" method="POST">
+                            <di1v class="form-group pb-2">        
                                 <label for="username">Administrador</label>
                                 <input type="text" id="username" name="username" placeholder="Nombre del administrador" >
                             </div>
