@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for,flash
+from flask import Flask, render_template, request, redirect, url_for,flash,session
 from flask_mysqldb import MySQL
 import database as db
+import MySQLdb.cursors
 
 from flask_login import LoginManager, login_user,logout_user,login_required
 #from flask_wtf.csrf import CSRFProtect
@@ -100,11 +101,21 @@ def pag_admin_login():
 #pagina de registro exitoso y usuario logeado
 @app.route('/ingreso')
 def pag_bienvenido():
-    return render_template('auth/ingreso.html')
+    return render_template('auth/ingresoUsuario.html')
 
 @app.route('/reg_exitoso')
 def pag_reg_exitoso():
     return render_template('aut/reg_exitoso.html')
+
+
+#log out ------------------
+#log out usuario
+@app.route('/logout')
+@login_required # protege paginas solo usuarios logeados pueden entrar
+def logout():
+    logout_user()
+    print('has cerrado exitosamente la pagina')
+    return redirect(url_for('pag_login'))
 
 
 #funciones 
@@ -142,37 +153,33 @@ def agregar_usuario():
     return redirect(url_for('pag_registrar'))
 
 #para login 
-@app.route('/ingresar_usuario', methods=['GET','POST'])
+@app.route('/ingresar_usuario', methods=['GET', 'POST'])
 def ingresar_usuario():
     if request.method == 'POST':
-        # Capturar los datos del formulario
         username = request.form['username']
         password = request.form['password']
 
-        # Crear un objeto Usuario
-        user = User(username, password)
+        user = User(username, password)  # No es necesario pasar nombre y apellido aquí aún
 
-        # Intentar hacer login
         try:
-            logger_user = ModelUser.login(db, user)
-            # Verifica si el usuario existe
-            if logger_user is not None:
-                # Comparar las contraseñas (texto plano)
-                if logger_user.password == user.password:
-                    return render_template('auth/ingreso.html')  # Redirige al éxito
+            logged_user = ModelUser.login(db.database, user)
+
+            if logged_user is not None:
+                if logged_user.password == user.password:
+                    login_user(logged_user)
+                    # Pasar nombre y apellido al template
+                    return render_template('auth/ingresoUsuario.html', nombre=logged_user.name, apellido=logged_user.lastname)
                 else:
                     flash("Usuario o contraseña incorrectos")
-                    return render_template('auth/login.html')
             else:
                 flash("Usuario o contraseña incorrectos")
-                return render_template('auth/login.html')
 
         except Exception as e:
-            flash(f'Error durante el inicio de sesión: {str(e)}')  # Captura el error
-            return render_template('auth/login.html')
+            flash(f'Error durante el inicio de sesión: {str(e)}')
 
-    # Si es un método GET, simplemente renderiza la página de login
     return render_template('auth/login.html')
+
+
 
 # INGRESAR ADMINISTRADOR 
 @app.route('/admin_login', methods=['GET', 'POST'])
@@ -200,6 +207,8 @@ def admin_login():
         except Exception as e:
             flash(f'Error durante el inicio de sesión: {str(e)}')
     return render_template('auth/login_admi.html')
+
+
 #@app.route('/escuhar_mp3')
 #def podcast():
 #    with connection.cursor() as cursor:
