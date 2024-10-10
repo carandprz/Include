@@ -76,6 +76,17 @@
                 <div class="col-4"> 
                     <div class="ingreso-container">
                         <h2 id="user-login" title="Ingreso de Usuarios" class="mb-3 text-center atkinson-hyperlegible-bold">Ingreso de Usuarios</h2>
+                        <!-- mensaje para error de usuario -->
+                        {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class= "alert alert-primary alert-dismissible" role="alert">
+                        <strong> {{ message }} </strong>
+                        <button type= "button" class="btn-close" data-bs-dismissible="alert" aria-label="Close"></button> 
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
                         <form id="login-form" action="/ingresar_usuario" method="POST">
                             <div class="form-group">        
                                 <label for="username">Usuario</label>
@@ -86,7 +97,7 @@
                                 <label for="password">Contraseña</label>
                                 <input type="password" id="password" placeholder="Contraseña" name="password">
                             </div>
-                           
+                            
                             <div class="form-group d-flex justify-content-center mt-3">
                                 <button id="login-button" title="INGRESAR" type="submit" class="btn btn-primary">INGRESAR</button>
                             </div>
