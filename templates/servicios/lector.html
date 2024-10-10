@@ -12,9 +12,54 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark includeHeader">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/">INCLUDE</a>
+                <a class="navbar-brand merriweather-black" href="#">INCLUDE</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto merriweather-regular">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/" aria-current="page">INICIO</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/normas">NORMAS DE USO</a>
+                        </li>
+                        <li class="nav-item">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    SERVICIOS
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                  <li><a class="dropdown-item" href="/servicios">Información de servicios</a></li>
+                                  <li><a class="dropdown-item" href="/audioLibro">Audiolibros</a></li>
+                                  <li><a class="dropdown-item" href="/cursos">Cursos</a></li>
+                                  <li><a class="dropdown-item" href="/podcast">Podcast</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/sobre-include">SOBRE INCLUDE</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/contacto">CONTACTO</a>
+                        </li>
+                        <li class="nav-item">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-user"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                  <li><a class="dropdown-item" href="/registro">Crear cuenta</a></li>
+                                  <li><a class="dropdown-item" href="/login">Ingresar</a></li>
+                                  <li><a class="dropdown-item" href="/admin-login">Administrador</a></li>
+                                </ul>
+                            </div>                              
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
     </header>
