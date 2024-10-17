@@ -1,8 +1,9 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for,flash,session
 from flask_mysqldb import MySQL
 import database as db
 import MySQLdb.cursors
-
+from werkzeug.utils import secure_filename
 from flask_login import LoginManager, login_user,logout_user,login_required
 #from flask_wtf.csrf import CSRFProtect
 #modelos para login 
@@ -32,6 +33,10 @@ def load_user(user_id):
         return admin
     
     return None  # Si no se encontró ningún usuario
+
+#onfiguración para la subida de archivos
+UPLOAD_FOLDER = 'audios/'  # Carpeta donde se guardarán los archivos
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # settings
 app.secret_key = 'mysecretkey'
@@ -72,7 +77,7 @@ def pag_registrar():
 def pag_login():
     return render_template('auth/login.html')
 
-#rutas pie de paginas
+#rutas pie de paginas --------------------------------------------
 @app.route('/normas')
 def pag_normas():
     return render_template('normas.html')
@@ -85,38 +90,49 @@ def pag_contacto():
 def pag_nosotros():
     return render_template('sobre-include.html')
 
-#administrador
+#---------------------------- administrador ------------------------------------------
 @app.route('/registroProducto')
+@login_required
 def pag_admin():
     return render_template('auth/pag_admi/registro_producto.html')
 
 @app.route('/admin-home')
 @login_required
 def pag_admin_home():
-    return render_template('auth/admin_home.html')
+    if 'logged_in' in session and session['logged_in']:
+        nombre_completo = session.get('nombre_completo', 'Usuario')
+        return render_template('auth/admin_home.html', nombre_completo=nombre_completo)
+    else:
+        flash("Por favor, inicia sesión para acceder a esta página.")
+        return redirect(url_for('pag_admin_login'))
+    #return render_template('auth/admin_home.html')
 
 @app.route('/admin-login')
 def pag_admin_login():
     return render_template('auth/admin-login.html')
 
-#pagina de registro exitoso y usuario logeado
-@app.route('/ingreso')
-def pag_bienvenido():
-    return render_template('auth/ingresoUsuario.html')
-
+#------------------------ pagina de registro exitoso ------------------
 @app.route('/reg_exitoso')
 def pag_reg_exitoso():
     return render_template('auth/reg_exitoso.html')
 
 
-#log out ------------------
+#------------------------ pagina usuario logeado ------------------
+@app.route('/ingreso')
+def pag_bienvenido():
+    return render_template('auth/ingresoUsuario.html')
+
+
+# --------------------------------- SALIR ------------------
 #log out usuario
 @app.route('/logout')
 @login_required # protege paginas solo usuarios logeados pueden entrar
 def logout():
+    session.clear() #limpiar todas las paginas variables
+    #sesion.pop('usuario',None)
     logout_user()
     print('has cerrado exitosamente la pagina')
-    return redirect(url_for('pag_login'))
+    return redirect(url_for('index'))
 
 
 #funciones 
@@ -182,7 +198,7 @@ def ingresar_usuario():
 
 
 
-# INGRESAR ADMINISTRADOR 
+# PARA INGRESAR ADMINISTRADOR 
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login(): 
     if request.method == 'POST':
@@ -192,6 +208,7 @@ def admin_login():
         try:
             logged_admi = ModelAdmi.login(db.database, admi)
             if logged_admi is not None:
+                #session['usuario'] = logged_in_user.username
                 if logged_admi.password == admi.password:
                     login_user(logged_admi)
                     # Pasar nombre y apellido al template
@@ -209,15 +226,68 @@ def admin_login():
             flash(f'Error durante el inicio de sesión: {str(e)}')
     return render_template('auth/admin-login.html')
 
+#verificar q el usuario siga estando en la pagina
+@app.route('/pagina1')
+def pagina1():
+    if 'logged_in' in session and session['logged_in']:
+        nombre_completo = session.get('nombre_completo', 'Usuario')
+        return render_template('pagina1.html', nombre_completo=nombre_completo)
+    else:
+        flash("Por favor, inicia sesión para acceder a esta página.")
+        return redirect(url_for('ingresar_usuario'))
 
-#@app.route('/escuhar_mp3')
-#def podcast():
-#    with connection.cursor() as cursor:
-#        # Consulta para obtener las rutas de los audios
-#        sql = "SELECT nombre, ruta FROM archivos"
-#        cursor.execute(sql)
-#        audios = cursor.fetchall()
-#    return render_template('podcast.html', audios=audios)
+#para los audios
+# Extensiones permitidas
+ALLOWED_EXTENSIONS = {'mp3', 'wav', 'm4a'}
+
+# Función para verificar si el archivo tiene una extensión permitida
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    # Recibir los datos del formulario
+    titulo = request.form['titulo']
+    descripcion = request.form['descripcion']
+    tipo = request.form['tipo']
+    autor = request.form['autor']
+
+    # Verificar si se ha subido un archivo
+    if 'archivo' not in request.files:
+        return 'No se seleccionó ningún archivo', 400
+
+    archivo = request.files['archivo']
+
+    # Verificar si el archivo es válido
+    if archivo.filename == '':
+        return 'No se seleccionó ningún archivo', 400
+
+    if archivo and allowed_file(archivo.filename):
+        # Guardar el archivo en el servidor
+        filename = secure_filename(archivo.filename)
+        archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        # Guardar la información en la base de datos
+        try:
+            cursor = db.database.cursor()
+            sql = """
+            INSERT INTO audiolibros_podcasts (titulo, autor, descripcion, tipo, archivo)
+            VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(sql, (titulo, autor, descripcion, tipo, filename))
+            db.database.commit()
+            cursor.close()
+            db.database.close()
+            return redirect(url_for('index'))
+        except Exception as e:
+            return f'Error al subir el archivo a la base de datos: {str(e)}', 500
+    else:
+        return 'Tipo de archivo no permitido', 400
+
 
 if __name__ == "__main__":
+    # Crear la carpeta de uploads si no existe
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
     app.run(port=5000, debug=True)
