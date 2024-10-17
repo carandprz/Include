@@ -75,6 +75,19 @@ CREATE TABLE IF NOT EXISTS administradores (
 );
 
 
+CREATE TABLE audiolibros_podcasts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    autor varchar(50) ,
+    descripcion TEXT,
+    tipo ENUM('audiolibro', 'podcast') NOT NULL,
+    archivo VARCHAR(255) NOT NULL,  -- Ruta o nombre del archivo
+    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+#------------------------------- no estan ------------------
 #tabla que habla sobre el archivo 
 CREATE TABLE audios (
     id INT AUTO_INCREMENT PRIMARY KEY,
