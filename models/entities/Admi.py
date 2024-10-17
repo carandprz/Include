@@ -6,6 +6,6 @@ class Admi(UserMixin):
         self.username = username
         self.name = name
         self.password = password
-
+    
     def get_id(self):
         return str(self.username)  # Necesario para Flask-Login

@@ -5,7 +5,7 @@ import database as db
 
 class ModelAdmi:
     @classmethod
-    def login(cls, db_connection, user, password):
+    def login(cls, db_connection, user):
         try:
             cursor = db_connection.cursor()
             sql = "SELECT * FROM administradores WHERE usuario = %s"
