@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for,flash,session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, send_from_directory
 from flask_mysqldb import MySQL
 import database as db
 import MySQLdb.cursors
@@ -94,18 +94,30 @@ def pag_nosotros():
 @app.route('/registroProducto')
 @login_required
 def pag_registroProd():
-    return render_template('auth/pag_admi/registro_producto.html')
+    if session.get('is_admin'):
+        if 'logged_in' in session and session['logged_in']:
+            nombre_completo = session.get('nombre_completo', 'Usuario')
+            #nombre_completo = session.get('nombre', 'Usuario') + " " + session.get('apellido', '')
+            return render_template('auth/pag_admi/registro_producto.html', nombre_completo=nombre_completo)
+        else:
+            flash("Por favor, inicia sesión para acceder a esta página.")
+            return redirect(url_for('pag_admin_login'))
+        #return render_template('auth/admin_home.html')
+    else:
+        flash("Acceso denegado. Esta página es solo para administradores.")
+        return redirect(url_for('pag_admin_login'))
 
 @app.route('/admin-home')
 @login_required
 def pag_admin_home():
     if 'logged_in' in session and session['logged_in']:
         nombre_completo = session.get('nombre_completo', 'Usuario')
+        #nombre_completo = session.get('nombre', 'Usuario') + " " + session.get('apellido', '')
         return render_template('auth/admin_home.html', nombre_completo=nombre_completo)
     else:
         flash("Por favor, inicia sesión para acceder a esta página.")
         return redirect(url_for('pag_admin_login'))
-    #return render_template('auth/admin_home.html')
+    #return render_template('auth/admin_home.ht11ml')
 
 @app.route('/admin-login')
 def pag_admin_login():
@@ -150,6 +162,7 @@ def agregar_usuario():
         telefono = request.form['phone']
         pais = request.form['country']
         
+        flash('Usuario ya existe')
         if contras1 != contrasena:
             flash('Las contraseñas no coinciden')
             return redirect(url_for('pag_registrar'))
@@ -184,6 +197,12 @@ def ingresar_usuario():
             if logged_user is not None:
                 if logged_user.password == user.password:
                     login_user(logged_user)
+                    # Almacenar datos en la sesión
+                    session['logged_in'] = True
+                    session['username'] = logged_user.username
+                    session['nombre'] = logged_user.name
+                    session['apellido'] = logged_user.lastname
+                    session['is_admin'] = False  # Usuario regular
                     # Pasar nombre y apellido al template
                     return render_template('auth/ingresoUsuario.html', nombre=logged_user.name, apellido=logged_user.lastname)
                 else:
@@ -211,6 +230,11 @@ def admin_login():
                 #session['usuario'] = logged_in_user.username
                 if logged_admi.password == admi.password:
                     login_user(logged_admi)
+                    # Almacenar datos en la sesión
+                    session['logged_in'] = True
+                    session['username'] = logged_admi.username
+                    session['nombre'] = logged_admi.name
+                    session['is_admin'] = True  # Usuario administrador
                     # Pasar nombre y apellido al template
                     try:
                         return render_template('auth/admin_home.html', nombre=logged_admi.name)
@@ -235,74 +259,86 @@ ALLOWED_EXTENSIONS = {'mp3', 'wav', 'm4a'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Ruta para servir los archivos subidos
+@app.route('/audios/<filename>')
+def audios(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    if session.get('is_admin'):
     # Recibir los datos del formulario
-    titulo = request.form['titulo']
-    descripcion = request.form['descripcion']
-    tipo = request.form['tipo']
-    autor = request.form['autor']
+        titulo = request.form['titulo']
+        descripcion = request.form['descripcion']
+        tipo = request.form['tipo']
+        autor = request.form['autor']
 
     # Verificar si se ha subido un archivo
-    if 'archivo' not in request.files:
-        flash('No se seleccionó ningún archivo')
-        return redirect(url_for('pag_registroProd'))
+        if 'archivo' not in request.files:
+            flash('No se seleccionó ningún archivo')
+            return redirect(url_for('pag_registroProd'))
 
-    archivo = request.files['archivo']
+        archivo = request.files['archivo']
 
     # Verificar si el archivo es válido
-    if archivo.filename == '':
-        flash('El nombre del archivo está vacío. Por favor selecciona un archivo.')
-        return redirect(url_for('pag_registroProd'))
-        #return 'No se seleccionó ningún archivo', 400
-
-    if archivo and allowed_file(archivo.filename):
-        # Guardar el archivo en el servidor
-        filename = secure_filename(archivo.filename)
-        archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-        # Guardar la información en la base de datos
-        try:
-            cursor = db.database.cursor()
-            sql = """
-            INSERT INTO audiolibros_podcasts (titulo, autor, descripcion, tipo, archivo)
-            VALUES (%s, %s, %s, %s, %s)
-            """
-            cursor.execute(sql, (titulo, autor, descripcion, tipo, filename))
-            db.database.commit()
-            cursor.close()
-            db.database.close()
-            flash('Archivo subido exitosamente')
-            return redirect(url_for('index'))
-        except Exception as e:
-            flash(f'Error al subir el archivo: {str(e)}')
+        if archivo.filename == '':
+            flash('El nombre del archivo está vacío. Por favor selecciona un archivo.')
             return redirect(url_for('pag_registroProd'))
-            #return f'Error al subir el archivo a la base de datos: {str(e)}', 500
-    else:
-        flash('Tipo de archivo no permitido. Solo se permiten archivos mp3, wav y m4a.')
-        return redirect(url_for('pag_registroProd'))
-        #return 'Tipo de archivo no permitido', 400
+            #return 'No se seleccionó ningún archivo', 400
 
-#---------------------- BILIOTECA DE ADMINISTRADOR ---------------------------
+        if archivo and allowed_file(archivo.filename):
+            # Guardar el archivo en el servidor
+            filename = secure_filename(archivo.filename)
+            archivo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+            # Guardar la información en la base de datos
+            try:
+                cursor = db.database.cursor()
+                sql = """
+                INSERT INTO audiolibros_podcasts (titulo, autor, descripcion, tipo, archivo)
+                VALUES (%s, %s, %s, %s, %s)
+                """
+                cursor.execute(sql, (titulo, autor, descripcion, tipo, filename))
+                db.database.commit()
+                cursor.close()
+                db.database.close()
+                flash('Archivo subido exitosamente')
+                return redirect(url_for('pag_registroProd'))
+            except Exception as e:
+                flash(f'Error al subir el archivo: {str(e)}')
+                return redirect(url_for('pag_registroProd'))
+                #return f'Error al subir el archivo a la base de datos: {str(e)}', 500
+        else:
+            flash('Tipo de archivo no permitido. Solo se permiten archivos mp3, wav y m4a.')
+            return redirect(url_for('pag_registroProd'))
+            #return 'Tipo de archivo no permitido', 400
+
+#---------------------- MOSTRAR BILIOTECA DE ADMINISTRADOR ---------------------------
 @app.route('/library')
 @login_required
 def library():
-    try:
-        cursor = db.database.cursor()
-        sql = "SELECT titulo, descripcion, tipo, archivo, fecha_subida FROM audiolibros_podcasts"
-        cursor.execute(sql)
-        archivos = cursor.fetchall()
-        cursor.close()
-        db.database.close()
-
-        return render_template('auth/pag_admi/biblioteca.html', archivos=archivos)
-    except Exception as e:
-        return f'Error al obtener los archivos: {str(e)}', 500
+    if session.get('is_admin'):
+        try:
+            cursor = db.database.cursor()
+            sql = "SELECT titulo, descripcion, tipo, archivo, fecha_subida FROM audiolibros_podcasts"
+            cursor.execute(sql)
+            archivos = cursor.fetchall()
+            cursor.close()
+            db.database.close()
+            return render_template('auth/pag_admi/biblioteca.html', archivos=archivos)
+        
+        except Exception as e:
+            flash(f'Error al obtener los archivos: {str(e)}')
+            return redirect(url_for('pag_admin_home'))
+    else:
+        flash("Acceso denegado. Esta página es solo para administradores.")
+        return redirect(url_for('pag_admin_home'))
 
 
 if __name__ == "__main__":
     # Crear la carpeta de uploads si no existe
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
+    
     app.run(port=5000, debug=True)
