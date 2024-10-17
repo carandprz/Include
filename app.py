@@ -93,7 +93,7 @@ def pag_nosotros():
 #---------------------------- administrador ------------------------------------------
 @app.route('/registroProducto')
 @login_required
-def pag_admin():
+def pag_registroProd():
     return render_template('auth/pag_admi/registro_producto.html')
 
 @app.route('/admin-home')
@@ -136,7 +136,7 @@ def logout():
 
 
 #funciones 
-#guardar datos de registro
+# --------------------------------- REGISTRO DE USUARIOS ---------------------------------
 @app.route('/agregar_usuario', methods=['POST'])
 def agregar_usuario():
     if request.method == 'POST':
@@ -169,7 +169,7 @@ def agregar_usuario():
         
     return redirect(url_for('pag_registrar'))
 
-#para login 
+#--------------------------- loggear USUARIO --------------------------------------
 @app.route('/ingresar_usuario', methods=['GET', 'POST'])
 def ingresar_usuario():
     if request.method == 'POST':
@@ -198,7 +198,7 @@ def ingresar_usuario():
 
 
 
-# PARA INGRESAR ADMINISTRADOR 
+# --------------------------- PARA INGRESAR ADMINISTRADOR ----------------------------
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login(): 
     if request.method == 'POST':
@@ -226,17 +226,8 @@ def admin_login():
             flash(f'Error durante el inicio de sesión: {str(e)}')
     return render_template('auth/admin-login.html')
 
-#verificar q el usuario siga estando en la pagina
-@app.route('/pagina1')
-def pagina1():
-    if 'logged_in' in session and session['logged_in']:
-        nombre_completo = session.get('nombre_completo', 'Usuario')
-        return render_template('pagina1.html', nombre_completo=nombre_completo)
-    else:
-        flash("Por favor, inicia sesión para acceder a esta página.")
-        return redirect(url_for('ingresar_usuario'))
 
-#para los audios
+# -------------------------- FUNCION PARA LOS AUDIOS -----------------------
 # Extensiones permitidas
 ALLOWED_EXTENSIONS = {'mp3', 'wav', 'm4a'}
 
@@ -255,13 +246,16 @@ def upload_file():
 
     # Verificar si se ha subido un archivo
     if 'archivo' not in request.files:
-        return 'No se seleccionó ningún archivo', 400
+        flash('No se seleccionó ningún archivo')
+        return redirect(url_for('pag_registroProd'))
 
     archivo = request.files['archivo']
 
     # Verificar si el archivo es válido
     if archivo.filename == '':
-        return 'No se seleccionó ningún archivo', 400
+        flash('El nombre del archivo está vacío. Por favor selecciona un archivo.')
+        return redirect(url_for('pag_registroProd'))
+        #return 'No se seleccionó ningún archivo', 400
 
     if archivo and allowed_file(archivo.filename):
         # Guardar el archivo en el servidor
@@ -279,11 +273,32 @@ def upload_file():
             db.database.commit()
             cursor.close()
             db.database.close()
+            flash('Archivo subido exitosamente')
             return redirect(url_for('index'))
         except Exception as e:
-            return f'Error al subir el archivo a la base de datos: {str(e)}', 500
+            flash(f'Error al subir el archivo: {str(e)}')
+            return redirect(url_for('pag_registroProd'))
+            #return f'Error al subir el archivo a la base de datos: {str(e)}', 500
     else:
-        return 'Tipo de archivo no permitido', 400
+        flash('Tipo de archivo no permitido. Solo se permiten archivos mp3, wav y m4a.')
+        return redirect(url_for('pag_registroProd'))
+        #return 'Tipo de archivo no permitido', 400
+
+#---------------------- BILIOTECA DE ADMINISTRADOR ---------------------------
+@app.route('/library')
+@login_required
+def library():
+    try:
+        cursor = db.database.cursor()
+        sql = "SELECT titulo, descripcion, tipo, archivo, fecha_subida FROM audiolibros_podcasts"
+        cursor.execute(sql)
+        archivos = cursor.fetchall()
+        cursor.close()
+        db.database.close()
+
+        return render_template('auth/pag_admi/biblioteca.html', archivos=archivos)
+    except Exception as e:
+        return f'Error al obtener los archivos: {str(e)}', 500
 
 
 if __name__ == "__main__":

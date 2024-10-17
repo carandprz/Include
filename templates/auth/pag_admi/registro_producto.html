@@ -72,6 +72,17 @@
                 <div class="col-4"> 
                     <div class="registro-container">
                         <h2 id="welcome-message" title="Registro de Usuarios" class="merriweather-bold text-center pt-4 pb-4">Registro de Audiolibros - Podcast </h2>
+                        <!-- mensaje para error de usuario -->
+                        {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class= "alert alert-primary alert-dismissible" role="alert">
+                            <strong> {{ message }} </strong>
+                            <button type= "button" class="btn-close" data-bs-dismissible="alert" aria-label="Close"></button> 
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
                         <form action="/upload" method="POST" enctype="multipart/form-data">
                             <label for="titulo">Título:</label>
                             <input type="text" id="titulo" name="titulo" required><br><br>

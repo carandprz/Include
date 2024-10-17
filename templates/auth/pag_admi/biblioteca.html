@@ -29,9 +29,6 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto merriweather-regular">
                         <li class="nav-item">
-                            <a class="nav-link" href="/">Biblioteca</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="/normas">NORMAS DE USO</a>
                         </li>
                         <li class="nav-item">
@@ -72,83 +69,42 @@
         </nav>
     </header>
     <main>
-        <div class="container my-5">
-            <div class="row d-flex justify-content-center">
-                <div class="col-md-8"> 
-                    <div class="perfil-container p-4 border rounded">
-                        <h2 class="merriweather-bold text-center mb-4">Mi Perfil</h2>
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <strong>Nombre de Usuario:</strong>
-                            </div>
-                            <div class="col-md-8">
-                                {{ user.username }}
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <strong>Nombre:</strong>
-                            </div>
-                            <div class="col-md-8">
-                                {{ user.name }}
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <strong>Apellido:</strong>
-                            </div>
-                            <div class="col-md-8">
-                                {{ user.lastname }}
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <strong>Correo Electrónico:</strong>
-                            </div>
-                            <div class="col-md-8">
-                                {{ user.email }}
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <strong>Fecha de Nacimiento:</strong>
-                            </div>
-                            <div class="col-md-8">
-                                {{ user.birth_date.strftime('%d/%m/%Y') if user.birth_date else 'No proporcionada' }}
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <strong>Teléfono:</strong>
-                            </div>
-                            <div class="col-md-8">
-                                {{ user.phone if user.phone else 'No proporcionado' }}
-                            </div>
-                        </div>
-                        <div class="row mb-4">
-                            <div class="col-md-4">
-                                <strong>País:</strong>
-                            </div>
-                            <div class="col-md-8">
-                                {{ user.country if user.country else 'No proporcionado' }}
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <a href="/editar_perfil" class="btn btn-primary me-2">Editar Perfil</a>
-                            <a href="/cambiar_contrasena" class="btn btn-secondary">Cambiar Contraseña</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Asistencia de Voz -->
-            <div class="row mt-5">
-                <div class="col-12 d-flex justify-content-center">
-                    <div class="voice-assistance">
-                        <button id="start-listening" class="btn btn-primary">Asistencia de Voz</button>
-                    </div>
-                </div>
+        <h1>Biblioteca de Audiolibros y Podcasts</h1>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Descripción</th>
+                    <th>Tipo</th>
+                    <th>Archivo</th>
+                    <th>Fecha de subida</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for archivo in archivos %}
+                <tr>
+                    <td>{{ archivo[0] }}</td>  <!-- Título -->
+                    <td>{{ archivo[1] }}</td>  <!-- Autor -->
+                    <td>{{ archivo[2] }}</td>  <!-- Descripcion -->
+                    <td>{{ archivo[3] }}</td>  <!-- Tipo (Audiolibro/Podcast) -->
+                    <td><a href="/uploads/{{ archivo[4] }}" target="_blank">Escuchar</a></td> <!-- Enlace al archivo -->
+                    <td>{{ archivo[5] }}</td>  <!-- Fecha de subida -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="row pt-5 pb-5">
+            <!-- Reproductor de audio -->
+            <div class="col-12 d-flex justify-content-center">
+                <audio id="audio-player" controls class="w-75">
+                    <source id="audio-source" src="" type="audio/mp3">
+                    Tu navegador no soporta el elemento de audio.
+                </audio>
             </div>
         </div>
+    <br>
+    <a href="/">Volver a subir más audiolibros/podcasts</a>
     </main>
     <footer>
         <div class="includeFooter bg-dark text-white py-4">
