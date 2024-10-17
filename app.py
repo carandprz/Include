@@ -86,13 +86,14 @@ def pag_nosotros():
     return render_template('sobre-include.html')
 
 #administrador
-@app.route('/admi')
+@app.route('/registroProducto')
 def pag_admin():
-    return render_template('admi.html')
+    return render_template('auth/pag_admi/registro_producto.html')
 
 @app.route('/admin-home')
+@login_required
 def pag_admin_home():
-    return render_template('admin-home.html')
+    return render_template('auth/admin_home.html')
 
 @app.route('/admin-login')
 def pag_admin_login():
@@ -105,7 +106,7 @@ def pag_bienvenido():
 
 @app.route('/reg_exitoso')
 def pag_reg_exitoso():
-    return render_template('aut/reg_exitoso.html')
+    return render_template('auth/reg_exitoso.html')
 
 
 #log out ------------------
@@ -195,10 +196,10 @@ def admin_login():
                     login_user(logged_admi)
                     # Pasar nombre y apellido al template
                     try:
-                        return render_template('auth/pag_admi/ingreso_admi.html', nombre=logged_admi.name)
+                        return render_template('auth/admin_home.html', nombre=logged_admi.name)
                     except Exception as e:
                         flash(f'Error al renderizar la plantilla: {str(e)}')
-                        return redirect(url_for('admin_login'))  # O cualquier otra ruta que quieras
+                        return redirect(url_for('admin-login'))  # O cualquier otra ruta que quieras
                     #return render_template('auth/pag_admi/ingreso_admi.html', nombre=logged_admi.name)
                 else:
                     flash("contraseña incorrectos")
@@ -206,7 +207,7 @@ def admin_login():
                 flash("Usuario incorrectos")
         except Exception as e:
             flash(f'Error durante el inicio de sesión: {str(e)}')
-    return render_template('auth/login_admi.html')
+    return render_template('auth/admin-login.html')
 
 
 #@app.route('/escuhar_mp3')
