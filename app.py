@@ -134,17 +134,6 @@ def pag_admin_perfil():
         flash("Por favor, inicia sesión para acceder a esta página.")
         return redirect(url_for('pag_admin_login'))
 
-@app.route('/perfilAdmi')
-@login_required
-def pag_admin_perfil():
-    if 'logged_in' in session and session['logged_in']:
-        nombre_completo = session.get('nombre_completo', 'Usuario')
-        #nombre_completo = session.get('nombre', 'Usuario') + " " + session.get('apellido', '')
-        return render_template('auth/admin_home.html', nombre_completo=nombre_completo)
-    else:
-        flash("Por favor, inicia sesión para acceder a esta página.")
-        return redirect(url_for('pag_admin_login'))
-
 #------------------------ pagina de registro exitoso ------------------
 @app.route('/reg_exitoso')
 def pag_reg_exitoso():
