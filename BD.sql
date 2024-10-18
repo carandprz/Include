@@ -13,6 +13,30 @@ CREATE TABLE IF NOT EXISTS usuarios (
     fecharegistro TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 );
 
+-- Tabla para almacenar información de los administradores
+CREATE TABLE IF NOT EXISTS administradores (
+    usuario varchar(10) primary key,
+    nombre_completo VARCHAR(50) NOT NULL,
+    correo_electronico VARCHAR(100) NOT NULL,
+    contrasena VARCHAR(255) NOT NULL, -- Se recomienda usar un hash en lugar de almacenar la contraseña directamente
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE audiolibros_podcasts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    autor varchar(50) ,
+    descripcion TEXT,
+    tipo ENUM('audiolibro', 'podcast') NOT NULL,
+    archivo VARCHAR(255) NOT NULL,  -- Ruta o nombre del archivo
+    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+
+#------------------------------- no estan ---------------------------------------------------------------------------------------
 #-------------------- Tabla para almacenar información del contenido -------------------------------------
 CREATE TABLE IF NOT EXISTS biblioteca (
     id_biblioteca INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
@@ -64,30 +88,8 @@ CREATE TABLE IF NOT EXISTS lista_canciones (
     #relacion entre canciones y lista de usuarios
 );
 
-#-------------------------------- ADMINISTRADORES ------------------------------------
--- Tabla para almacenar información de los administradores
-CREATE TABLE IF NOT EXISTS administradores (
-    usuario varchar(10) primary key,
-    nombre_completo VARCHAR(50) NOT NULL,
-    correo_electronico VARCHAR(100) NOT NULL,
-    contrasena VARCHAR(255) NOT NULL, -- Se recomienda usar un hash en lugar de almacenar la contraseña directamente
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
 
-CREATE TABLE audiolibros_podcasts (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    autor varchar(50) ,
-    descripcion TEXT,
-    tipo ENUM('audiolibro', 'podcast') NOT NULL,
-    archivo VARCHAR(255) NOT NULL,  -- Ruta o nombre del archivo
-    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-
-
-#------------------------------- no estan ------------------
 #tabla que habla sobre el archivo 
 CREATE TABLE audios (
     id INT AUTO_INCREMENT PRIMARY KEY,

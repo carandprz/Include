@@ -123,6 +123,28 @@ def pag_admin_home():
 def pag_admin_login():
     return render_template('auth/admin-login.html')
 
+@app.route('/perfilAdmi')
+@login_required
+def pag_admin_perfil():
+    if 'logged_in' in session and session['logged_in']:
+        nombre_completo = session.get('nombre_completo', 'Usuario')
+        #nombre_completo = session.get('nombre', 'Usuario') + " " + session.get('apellido', '')
+        return render_template('auth/admin_home.html', nombre_completo=nombre_completo)
+    else:
+        flash("Por favor, inicia sesión para acceder a esta página.")
+        return redirect(url_for('pag_admin_login'))
+
+@app.route('/perfilAdmi')
+@login_required
+def pag_admin_perfil():
+    if 'logged_in' in session and session['logged_in']:
+        nombre_completo = session.get('nombre_completo', 'Usuario')
+        #nombre_completo = session.get('nombre', 'Usuario') + " " + session.get('apellido', '')
+        return render_template('auth/admin_home.html', nombre_completo=nombre_completo)
+    else:
+        flash("Por favor, inicia sesión para acceder a esta página.")
+        return redirect(url_for('pag_admin_login'))
+
 #------------------------ pagina de registro exitoso ------------------
 @app.route('/reg_exitoso')
 def pag_reg_exitoso():
@@ -311,7 +333,7 @@ def upload_file():
                 #return f'Error al subir el archivo a la base de datos: {str(e)}', 500
         else:
             flash('Tipo de archivo no permitido. Solo se permiten archivos mp3, wav y m4a.')
-            return redirect(url_for('pag_registroProd'))
+            return redirect(url_for('index'))
             #return 'Tipo de archivo no permitido', 400
 
 #---------------------- MOSTRAR BILIOTECA DE ADMINISTRADOR ---------------------------
@@ -333,7 +355,50 @@ def library():
             return redirect(url_for('pag_admin_home'))
     else:
         flash("Acceso denegado. Esta página es solo para administradores.")
-        return redirect(url_for('pag_admin_home'))
+        return redirect(url_for('index'))
+
+@app.route('/perfilAdmi')
+@login_required
+def perfilAdmi():
+    if session.get('is_admin'):
+        try:
+            cursor = db.database.cursor()
+            sql = "SELECT * FROM administradores"
+            cursor.execute(sql)
+            archivos = cursor.fetchall()
+            cursor.close()
+            db.database.close()
+            return render_template('auth/pag_admi/perfilAdmi.html', archivos=archivos)
+        
+        except Exception as e:
+            flash(f'Error al obtener los archivos: {str(e)}')
+            return redirect(url_for('pag_admin_home'))
+    else:
+        flash("Acceso denegado. Esta página es solo para administradores.")
+        return redirect(url_for('index'))
+
+
+# MOSTRAR USUARIOS
+@app.route('/verUsuarios')
+@login_required
+def verUsuarios():
+    if session.get('is_admin'):
+        try:
+            cursor = db.database.cursor()
+            sql = "SELECT * FROM usuarios"
+            cursor.execute(sql)
+            archivos = cursor.fetchall()
+            cursor.close()
+            db.database.close()
+            return render_template('auth/pag_admi/ver_usuarios.html', archivos=archivos)
+        
+        except Exception as e:
+            flash(f'Error al obtener los archivos: {str(e)}')
+            return redirect(url_for('pag_admin_home'))
+    else:
+        flash("Acceso denegado. Esta página es solo para administradores.")
+        return redirect(url_for('index'))
+
 
 
 if __name__ == "__main__":
