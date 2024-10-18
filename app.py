@@ -35,7 +35,7 @@ def load_user(user_id):
     return None  # Si no se encontró ningún usuario
 
 #onfiguración para la subida de archivos
-UPLOAD_FOLDER = 'audios/'  # Carpeta donde se guardarán los archivos
+UPLOAD_FOLDER = 'static/audiol_Podcast/'  # Carpeta donde se guardarán los archivos
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # settings
@@ -90,61 +90,15 @@ def pag_contacto():
 def pag_nosotros():
     return render_template('sobre-include.html')
 
-#---------------------------- administrador ------------------------------------------
-@app.route('/registroProducto')
-@login_required
-def pag_registroProd():
-    if session.get('is_admin'):
-        if 'logged_in' in session and session['logged_in']:
-            nombre_completo = session.get('nombre_completo', 'Usuario')
-            #nombre_completo = session.get('nombre', 'Usuario') + " " + session.get('apellido', '')
-            return render_template('auth/pag_admi/registro_producto.html', nombre_completo=nombre_completo)
-        else:
-            flash("Por favor, inicia sesión para acceder a esta página.")
-            return redirect(url_for('pag_admin_login'))
-        #return render_template('auth/admin_home.html')
-    else:
-        flash("Acceso denegado. Esta página es solo para administradores.")
-        return redirect(url_for('pag_admin_login'))
-
-@app.route('/admin-home')
-@login_required
-def pag_admin_home():
-    if 'logged_in' in session and session['logged_in']:
-        nombre_completo = session.get('nombre_completo', 'Usuario')
-        #nombre_completo = session.get('nombre', 'Usuario') + " " + session.get('apellido', '')
-        return render_template('auth/admin_home.html', nombre_completo=nombre_completo)
-    else:
-        flash("Por favor, inicia sesión para acceder a esta página.")
-        return redirect(url_for('pag_admin_login'))
-    #return render_template('auth/admin_home.ht11ml')
-
-@app.route('/admin-login')
-def pag_admin_login():
-    return render_template('auth/admin-login.html')
-
-@app.route('/perfilAdmi')
-@login_required
-def pag_admin_perfil():
-    if 'logged_in' in session and session['logged_in']:
-        nombre_completo = session.get('nombre_completo', 'Usuario')
-        #nombre_completo = session.get('nombre', 'Usuario') + " " + session.get('apellido', '')
-        return render_template('auth/admin_home.html', nombre_completo=nombre_completo)
-    else:
-        flash("Por favor, inicia sesión para acceder a esta página.")
-        return redirect(url_for('pag_admin_login'))
-
 #------------------------ pagina de registro exitoso ------------------
 @app.route('/reg_exitoso')
 def pag_reg_exitoso():
     return render_template('auth/reg_exitoso.html')
 
-
 #------------------------ pagina usuario logeado ------------------
 @app.route('/ingreso')
 def pag_bienvenido():
     return render_template('auth/ingresoUsuario.html')
-
 
 # --------------------------------- SALIR ------------------
 #log out usuario
@@ -226,6 +180,39 @@ def ingresar_usuario():
 
     return render_template('auth/login.html')
 
+
+#---------------------------- administrador ------------------------------------------
+@app.route('/registroProducto')
+@login_required
+def pag_registroProd():
+    if session.get('is_admin'):
+        if 'logged_in' in session and session['logged_in']:
+            nombre_completo = session.get('nombre_completo', 'Usuario')
+            #nombre_completo = session.get('nombre', 'Usuario') + " " + session.get('apellido', '')
+            return render_template('auth/pag_admi/registro_producto.html', nombre_completo=nombre_completo)
+        else:
+            flash("Por favor, inicia sesión para acceder a esta página.")
+            return redirect(url_for('pag_admin_login'))
+        #return render_template('auth/admin_home.html')
+    else:
+        flash("Acceso denegado. Esta página es solo para administradores.")
+        return redirect(url_for('pag_admin_login'))
+
+@app.route('/admin-home')
+@login_required
+def pag_admin_home():
+    if 'logged_in' in session and session['logged_in']:
+        nombre_completo = session.get('nombre_completo', 'Usuario')
+        #nombre_completo = session.get('nombre', 'Usuario') + " " + session.get('apellido', '')
+        return render_template('auth/admin_home.html', nombre_completo=nombre_completo)
+    else:
+        flash("Por favor, inicia sesión para acceder a esta página.")
+        return redirect(url_for('pag_admin_login'))
+    #return render_template('auth/admin_home.ht11ml')
+
+@app.route('/admin-login')
+def pag_admin_login():
+    return render_template('auth/admin-login.html')
 
 
 # --------------------------- PARA INGRESAR ADMINISTRADOR ----------------------------
@@ -367,7 +354,7 @@ def perfilAdmi():
         return redirect(url_for('index'))
 
 
-# MOSTRAR USUARIOS
+#---------- MOSTRAR USUARIOS  --------------------
 @app.route('/verUsuarios')
 @login_required
 def verUsuarios():
